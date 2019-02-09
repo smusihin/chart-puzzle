@@ -10,9 +10,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { withStyles } from '@material-ui/core/styles';
 import MenuItem from './MenuItem'
 
-
-
-
 const styles = theme => ({    
     tabRoot: {
       minWidth: 10,
@@ -55,11 +52,11 @@ class ComponentsMenu extends React.Component{
                     variant="fullWidth"
                     indicatorColor="primary"
                     textColor="primary">
-                    <Tab label="BASIC" classes={{ root: classes.tabRoot }}/>
                     <Tab label="CHARTS" classes={{ root: classes.tabRoot }}/>
+                    <Tab label="LAYOUT" classes={{ root: classes.tabRoot }}/>                    
                 </Tabs>
-                {menu === 0 && this.renderMenu(['Column', 'Button', 'Dropdown'])}
-                {menu === 1 && this.renderMenu(['Scatter', 'Bar Chart', 'Pie Chart'])}
+                {menu === 1 && this.renderMenu(['Column', 'Button', 'Dropdown'])}
+                {menu === 0 && this.renderMenu(['Scatter', 'Bar Chart', 'Pie Chart'])}
               </div>
     }
 }

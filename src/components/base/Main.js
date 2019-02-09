@@ -41,8 +41,13 @@ const styles = theme => ({
 
 class Main extends React.Component {  
 
-  renderBoard = (type)=>{
-    return <Board type = {type} renderItem = {this.renderBoard}/>
+  renderBoard = (item)=>{
+    return <Board
+      id = {item ? item.id : "main_board"}
+      type = {item ? item.type : "board"}
+      renderItem = {this.renderBoard}
+      removeItem = {item ? item.remove: ()=>{alert("board");}}
+      addItemBefore = {item ? item.addItemBefore: (el)=>{}}/>
   }
   
   render = ()=>{

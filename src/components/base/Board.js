@@ -3,7 +3,10 @@ import { findDOMNode } from 'react-dom';
 import { DropTarget } from 'react-dnd';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-
+import Button from '@material-ui/core/Button';
+import CloseIcon from '@material-ui/icons/Close';
+import { redBright } from 'ansi-colors';
+import DropArea from './DropArea';
 // Drag sources and drop targets only interact
 // if they have the same string type.
 // You want to keep types in a separate file with
@@ -11,6 +14,18 @@ import { withStyles } from '@material-ui/core/styles';
 const Types = {
   CARD: 'card'
 };
+
+function uniqueID () {
+  function chr4(){
+    return Math.random().toString(16).slice(-4);
+  }
+  return chr4() + chr4() +
+    '-' + chr4() +
+    '-' + chr4() +
+    '-' + chr4() +
+    '-' + chr4() + chr4() + chr4();
+}
+
 
 /**
  * Specifies the drop target contract.
@@ -78,14 +93,33 @@ function collect(connect, monitor) {
   };
 }
 
-const styles = {
+const styles = theme =>( {
   board: {
     width: '100%',
-    border: '1px dashed blue',
-    padding: 15
-
+    border: '1px dashed white',
+    paddingBottom: 15,
+    paddingLeft:5,
+    paddingRight:5,
+    marginTop:25,
+   
   },
-};
+  topboard: {
+    float: 'right',
+    marginTop:-25,
+    marginRight:-5 
+  },
+  droparea: {
+    float: 'left',
+    width: '100%',
+    marginTop:-25
+  },
+  button: {
+    margin: theme.spacing.unit,
+    minWidth:10,
+    margin:0,
+    padding:3
+  },
+});
 
 class Board extends React.Component{
   state = {
@@ -107,19 +141,68 @@ class Board extends React.Component{
     }
   }
 
-  addItem(item){
-    const items = [...this.state.items,item];
+  removeChild = (id) =>{
+    const items = this.state.items;
+    const index = items.findIndex(item=>item.id === id);
+    if (index === -1) 
+      return;
+    items.splice(index, 1);
+    this.setState({items});
+  }
+
+  addItem(typeEl, idBefore = 0){
+    const itemId = uniqueID();
+    const item = {
+      id: itemId,
+      type: typeEl,
+      remove: ()=>{this.removeChild(itemId)},
+      addItemBefore: (typeEl)=>{this.addItem(typeEl, itemId)}
+    };
+    let items = this.state.items;
+    const index = items.findIndex(item=>item.id === idBefore);
+    if(idBefore === 0){
+      items = [...items,item];
+      this.setState({items})
+      return;
+    }
+    if (index < 0 ) 
+      return;
+    items.splice(index,0,item)
     this.setState({items})
+    
+
+    
+
+    
   }
 
   render() {
     // These props are injected by React DnD,
     // as defined by your `collect` function above:
-    const {isOver, connectDropTarget, classes, renderItem} = this.props;
+    const {
+      isOver,
+      connectDropTarget,
+      classes,
+      renderItem,
+      removeItem,
+      addItemBefore,
+      type
+    } = this.props;
+
+
 
     return connectDropTarget(
-      <div className = {classes.board}> 
-          {this.state.items.map(itemType=>{return renderItem(itemType)})}
+      <div className = {classes.board}>
+        <DropArea onDropArea = {(el)=>{addItemBefore(el)}}className = {classes.droparea}/>         
+        <div className = {classes.topboard}>                             
+          <Button onClick = {(event)=>{
+            removeItem();
+            event.stopPropagation()}} className={classes.button}>
+            <CloseIcon fontSize="small" />
+          </Button>          
+        </div>
+          {type}
+          {this.state.items.map(item=>{return renderItem(item)})}
       </div>
     );
   }
